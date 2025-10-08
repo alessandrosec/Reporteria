@@ -31,7 +31,7 @@ try {
 }
 
 try {
-  db.docentes = require("./estudiante.model.js")(sequelize, Sequelize);
+  db.estudiante = require("./estudiante.model.js")(sequelize, Sequelize);
   console.log("✅ Modelo 'estudiante' cargado correctamente.");
 } catch (err) {
   console.error("❌ Error al cargar modelo 'estudiante':", err.message);
@@ -39,6 +39,14 @@ try {
 
 db.boleta = require("./boleta.model.js")(sequelize, Sequelize);
 db.factura = require("./factura.model.js")(sequelize, Sequelize);
+
+// Rutas de Reportería
+try{
+  require("./app/routes/reporte.routes")(app);
+  console.log("reporte.routes.js cargado correctamente");
+}catch(err){
+  console.error("Error al cargar reporte.routes.js:", err.message);
+}
 
 //Definir relaciones entre modelos
 db.estudiante.hasMany(db.boleta, {
@@ -50,5 +58,30 @@ db.boleta.belongsTo(db.estudiante, {
   foreignKey: "id_estudiante",
   as: "estudiante"
 });
+
+/*
+// Modelos base
+db.docente = require("./docente.model.js")(sequelize, Sequelize);
+db.carrera = require("./carrera.model.js")(sequelize, Sequelize);
+db.estudianteCarrera = require("./estudianteCarrera.model.js")(sequelize, Sequelize);
+// Relaciones muchos a muchos
+db.estudiante.belongsToMany(db.carrera, {
+  through: db.estudianteCarrera,
+  foreignKey: 'estudianteId',
+  otherKey: 'carreraId'
+});
+
+db.carrera.belongsToMany(db.estudiante, {
+  through: db.estudianteCarrera,
+  foreignKey: 'carreraId',
+  otherKey: 'estudianteId'
+});
+
+// Relación carrera → docente (coordinador)
+db.carrera.belongsTo(db.docente, {
+  foreignKey: 'docenteId',
+  as: 'coordinador'
+});
+*/
 
 module.exports = db;
