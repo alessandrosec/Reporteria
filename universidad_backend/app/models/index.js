@@ -40,12 +40,11 @@ try {
 db.boleta = require("./boleta.model.js")(sequelize, Sequelize);
 db.factura = require("./factura.model.js")(sequelize, Sequelize);
 
-// Rutas de Reportería
-try{
-  require("./app/routes/reporte.routes")(app);
-  console.log("reporte.routes.js cargado correctamente");
-}catch(err){
-  console.error("Error al cargar reporte.routes.js:", err.message);
+try {
+  db.historialReporte = require("./historial_reporte.model.js")(sequelize, Sequelize);
+  console.log("✅ Modelo 'historialReporte' cargado correctamente.");
+} catch (err) {
+  console.error("❌ Error al cargar modelo 'historialReporte':", err.message);
 }
 
 //Definir relaciones entre modelos
@@ -59,29 +58,19 @@ db.boleta.belongsTo(db.estudiante, {
   as: "estudiante"
 });
 
-/*
-// Modelos base
-db.docente = require("./docente.model.js")(sequelize, Sequelize);
-db.carrera = require("./carrera.model.js")(sequelize, Sequelize);
-db.estudianteCarrera = require("./estudianteCarrera.model.js")(sequelize, Sequelize);
-// Relaciones muchos a muchos
-db.estudiante.belongsToMany(db.carrera, {
-  through: db.estudianteCarrera,
-  foreignKey: 'estudianteId',
-  otherKey: 'carreraId'
-});
+if (db.estudiante && db.historialReporte) {
+  db.estudiante.hasMany(db.historialReporte, {
+    foreignKey: "id_estudiante",
+    as: "historial_reportes"
+  });
 
-db.carrera.belongsToMany(db.estudiante, {
-  through: db.estudianteCarrera,
-  foreignKey: 'carreraId',
-  otherKey: 'estudianteId'
-});
+  db.historialReporte.belongsTo(db.estudiante, {
+    foreignKey: "id_estudiante",
+    as: "estudiante"
+  });
+  console.log("✅ Relación Estudiante-HistorialReporte definida.");
+}
 
-// Relación carrera → docente (coordinador)
-db.carrera.belongsTo(db.docente, {
-  foreignKey: 'docenteId',
-  as: 'coordinador'
-});
-*/
+console.log("\n✅ Todos los modelos y relaciones cargados.\n");
 
 module.exports = db;

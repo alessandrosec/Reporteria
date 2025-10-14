@@ -52,6 +52,13 @@ try{
 require("./app/routes/boleta.route")(app);
 require("./app/routes/factura.route")(app);
 
+try{
+  require("./app/routes/reporte.routes")(app);
+  console.log("✅ reporte.routes.js cargado correctamente");
+}catch(err){
+  console.error("❌ Error al cargar reporte.routes.js:", err.message);
+}
+
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
   console.log(`Servidor levantado en puerto ${PORT}.`);
