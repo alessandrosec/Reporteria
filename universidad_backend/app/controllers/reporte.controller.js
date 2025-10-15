@@ -3,9 +3,7 @@ const HistorialReporte = db.historialReportes;
 const pdfGenerator = require("../services/pdf-generator.service");
 const dataService = require("../services/data-mock.service");
 
-// ============================================
-// CERTIFICADO CURSOS - Preview (JSON)
-// ============================================
+// CERTIFICADO CURSOS - (JSON)
 exports.previewCertificadoCursos = async (req, res) => {
     try {
         const idEstudiante = req.params.id;
@@ -30,9 +28,7 @@ exports.previewCertificadoCursos = async (req, res) => {
     }
 };
 
-// ============================================
 // CERTIFICADO CURSOS - Descargar PDF
-// ============================================
 exports.descargarCertificadoCursos = async (req, res) => {
     try {
         const idEstudiante = req.params.id;
@@ -57,9 +53,7 @@ exports.descargarCertificadoCursos = async (req, res) => {
     }
 };
 
-// ============================================
-// REPORTE NOTAS - Preview (JSON)
-// ============================================
+// REPORTE NOTAS - (JSON)
 exports.previewReporteNotas = async (req, res) => {
     try {
         const idEstudiante = req.params.id;
@@ -88,9 +82,7 @@ exports.previewReporteNotas = async (req, res) => {
     }
 };
 
-// ============================================
 // REPORTE NOTAS - Descargar PDF
-// ============================================
 exports.descargarReporteNotas = async (req, res) => {
     try {
         const idEstudiante = req.params.id;
@@ -116,9 +108,7 @@ exports.descargarReporteNotas = async (req, res) => {
     }
 };
 
-// ============================================
-// REPORTE PAGOS - Preview (JSON)
-// ============================================
+// REPORTE PAGOS - (JSON)
 exports.previewReportePagos = async (req, res) => {
     try {
         const idEstudiante = req.params.id;
@@ -141,9 +131,7 @@ exports.previewReportePagos = async (req, res) => {
     }
 };
 
-// ============================================
 // REPORTE PAGOS - Descargar PDF
-// ============================================
 exports.descargarReportePagos = async (req, res) => {
     try {
         const idEstudiante = req.params.id;
@@ -168,9 +156,7 @@ exports.descargarReportePagos = async (req, res) => {
     }
 };
 
-// ============================================
 // HISTORIAL DE REPORTES
-// ============================================
 exports.obtenerHistorial = async (req, res) => {
     try {
         const idEstudiante = req.params.id;

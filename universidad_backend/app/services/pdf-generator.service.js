@@ -17,7 +17,7 @@ class PDFGeneratorService {
                throw new Error(`Tipo de reporte no soportado: ${tipoReporte}`);
       }
    }
-    
+   
     // ========================================
     // CERTIFICADO DE CURSOS APROBADOS
     // ========================================
