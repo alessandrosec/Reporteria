@@ -93,13 +93,14 @@ class DataService {
         return `Pago vía ${tipoTransaccion || 'No especificado'}`;
     }
     
+    // ------------------------------------
+    //-------------------------------------
     // CURSOS APROBADOS (nota >= 61)
-    // TEMPORAL: Usa mock hasta tener tabla de notas
+    // TEMPORAL
+
     async obtenerCursosAprobados(idEstudiante) {
-        console.warn('⚠️ ADVERTENCIA: obtenerCursosAprobados() está usando datos MOCK');
-        console.warn('   Necesitas crear las tablas: notas, cursos, materias');
-        
-        // TODO: Implementar consulta real cuando existan las tablas
+            
+        // TODO: Implementar consulta real cuando existan la tabla curso
         // Query esperado:
         // SELECT c.id, m.nombre, m.creditos, n.* 
         // FROM notas n
@@ -107,37 +108,8 @@ class DataService {
         // JOIN materias m ON c.id_materia = m.id
         // WHERE n.id_estudiante = ? AND (n.primer_parcial + n.segundo_parcial + n.parcial_final + n.actividades) >= 61
         
-        // Datos MOCK temporales
-        return [
-            {
-                id_curso: 1,
-                codigo: 'MAT101',
-                nombre: 'Matemática I',
-                creditos: 4,
-                primer_parcial: 20,
-                segundo_parcial: 22,
-                parcial_final: 25,
-                actividades: 18,
-                nota_final: 85,
-                periodo: '2024-1',
-                estado: 'APROBADO'
-            },
-            {
-                id_curso: 2,
-                codigo: 'PRO101',
-                nombre: 'Programación I',
-                creditos: 5,
-                primer_parcial: 23,
-                segundo_parcial: 24,
-                parcial_final: 28,
-                actividades: 17,
-                nota_final: 92,
-                periodo: '2024-1',
-                estado: 'APROBADO'
-            }
-        ];
-        
-        /* IMPLEMENTACIÓN (cuando tenga las tablas):
+
+        /* IMPLEMENTACIÓN DE ÇODIGO CUANDO SE OBTENGA EL MODEL CURSO:
         
         try {
             const cursos = await db.sequelize.query(`
@@ -173,78 +145,11 @@ class DataService {
         */
     }
 
+    //-------------------------------
     // NOTAS POR SEMESTRE
-    // TEMPORAL: Usa mock hasta tener tabla de notas
+    // TEMPORAR
     async obtenerNotasPorSemestre(idEstudiante, semestre) {
-        console.warn('⚠️ ADVERTENCIA: obtenerNotasPorSemestre() está usando datos MOCK');
-        console.warn('   Necesitas crear las tablas: notas, cursos, materias');
-        
         // TODO: Implementar consulta cuando exista las tabla
-        
-        // Datos MOCK temporales por semestre
-        const todosCursos = {
-            '2024-1': [
-                {
-                    codigo: 'MAT101',
-                    nombre: 'Matemática I',
-                    creditos: 4,
-                    primer_parcial: 20,
-                    segundo_parcial: 22,
-                    parcial_final: 25,
-                    actividades: 18,
-                    nota_final: 85,
-                    estado: 'APROBADO'
-                },
-                {
-                    codigo: 'PRO101',
-                    nombre: 'Programación I',
-                    creditos: 5,
-                    primer_parcial: 23,
-                    segundo_parcial: 24,
-                    parcial_final: 28,
-                    actividades: 17,
-                    nota_final: 92,
-                    estado: 'APROBADO'
-                },
-                {
-                    codigo: 'FIS101',
-                    nombre: 'Física I',
-                    creditos: 4,
-                    primer_parcial: 12,
-                    segundo_parcial: 15,
-                    parcial_final: 18,
-                    actividades: 10,
-                    nota_final: 55,
-                    estado: 'REPROBADO'
-                }
-            ],
-            '2024-2': [
-                {
-                    codigo: 'BDD201',
-                    nombre: 'Base de Datos',
-                    creditos: 4,
-                    primer_parcial: 18,
-                    segundo_parcial: 20,
-                    parcial_final: 23,
-                    actividades: 17,
-                    nota_final: 78,
-                    estado: 'APROBADO'
-                },
-                {
-                    codigo: 'WEB301',
-                    nombre: 'Desarrollo Web',
-                    creditos: 5,
-                    primer_parcial: 22,
-                    segundo_parcial: 23,
-                    parcial_final: 26,
-                    actividades: 17,
-                    nota_final: 88,
-                    estado: 'APROBADO'
-                }
-            ]
-        };
-        
-        return todosCursos[semestre] || [];
         
         /* IMPLEMENTACIÓN OF (esperando tabla):
         
