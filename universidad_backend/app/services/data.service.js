@@ -1,193 +1,233 @@
-const db = require("../models");
-const Estudiante = db.estudiante;
-const Boleta = db.boleta;
-const Usuario = db.usuarios;
+/**
+ * =========================================
+ * SERVICE: data-real (DATOS REALES)
+ * =========================================
+ * Obtiene datos reales de la base de datos Oracle
+ * Versión ajustada para model Estudiante de Pablo
+ */
 
-class DataService {
+const db = require("../models");
+const { Sequelize, Op } = require('sequelize');
+
+class DataRealService {
     
-    // ESTUDIANTE - Consulta a la BD
+    /**
+     * ========================================
+     * MÉTODO: obtenerInfoEstudiante
+     * ========================================
+     */
     async obtenerInfoEstudiante(idEstudiante) {
         try {
-            // Buscar estudiante con su usuario relacionado
-            const estudiante = await Estudiante.findByPk(idEstudiante, {
-                include: [{
-                    model: Usuario,
-                    attributes: ['correo']
-                }]
-            });
+            console.log(`🔍 Buscando estudiante con ID: ${idEstudiante}`);
+            
+            const Estudiante = db.estudiantes;
+            
+            const estudiante = await Estudiante.findByPk(idEstudiante);
             
             if (!estudiante) {
                 throw new Error(`Estudiante con ID ${idEstudiante} no encontrado`);
             }
             
-            // Formatear respuesta según lo que espera el PDF generator
+            console.log(`✅ Estudiante encontrado: ${estudiante.nombre} ${estudiante.apellido}`);
+            
             return {
                 id: estudiante.id,
-                carnet: estudiante.carnet || 'N/A',
-                nombre: estudiante.nombre || 'Sin nombre',
-                apellido: '', // El modelo actual no tiene apellido separado
+                carnet: estudiante.carnet,
+                nombre: estudiante.nombre,
+                apellido: estudiante.apellido,
                 fechaNacimiento: estudiante.fechaNacimiento,
                 genero: estudiante.genero,
-                carrera: 'N/A' // El modelo actual no tiene carrera
+                carrera: 'Ingeniería en Sistemas' // TODO: Obtener desde relación
             };
             
         } catch (error) {
-            console.error('Error al obtener info de estudiante:', error);
+            console.error("❌ Error al obtener estudiante:", error.message);
             throw error;
         }
     }
     
-    // PAGOS - Consulta a tabla boletas
-    async obtenerPagosEstudiante(idEstudiante) {
+    /**
+     * ========================================
+     * MÉTODO: obtenerCursosAprobados
+     * ========================================
+     */
+    async obtenerCursosAprobados(idEstudiante) {
         try {
-            // Consultar todas las boletas del estudiante
-            const boletas = await Boleta.findAll({
-                where: { 
-                    id_estudiante: idEstudiante 
+            console.log(`🔍 Buscando cursos aprobados del estudiante ${idEstudiante}`);
+            
+            const Nota = db.notas;
+            const Curso = db.cursos;
+            const Materia = db.materias;
+            
+            // Consulta con JOINs
+            const notas = await Nota.findAll({
+                where: {
+                    id_estudiante: idEstudiante
                 },
-                order: [['fecha_pago', 'DESC']] // Ordenar por fecha descendente
+                include: [{
+                    model: Curso,
+                    as: 'curso',
+                    required: true,
+                    include: [{
+                        model: Materia,
+                        as: 'materia',
+                        required: true
+                    }]
+                }],
+                raw: false
             });
             
-            if (!boletas || boletas.length === 0) {
-                console.warn(`No se encontraron pagos para estudiante ${idEstudiante}`);
-                return []; // Retornar array vacío si no hay pagos
+            console.log(`✅ Se encontraron ${notas.length} notas`);
+            
+            // Filtrar solo aprobados y transformar
+            const cursosAprobados = notas
+                .map(nota => {
+                    const notaFinal = 
+                        (nota.primer_parcial || 0) + 
+                        (nota.segundo_parcial || 0) + 
+                        (nota.parcial_final || 0) + 
+                        (nota.actividades || 0);
+                    
+                    // Solo cursos aprobados (>= 61)
+                    if (notaFinal < 61) return null;
+                    
+                    return {
+                        id_curso: nota.curso.id,
+                        codigo: `${nota.curso.materia.nombre.substring(0, 3).toUpperCase()}${nota.curso.id}`,
+                        nombre: nota.curso.materia.nombre,
+                        creditos: nota.curso.materia.creditos,
+                        primer_parcial: nota.primer_parcial || 0,
+                        segundo_parcial: nota.segundo_parcial || 0,
+                        parcial_final: nota.parcial_final || 0,
+                        actividades: nota.actividades || 0,
+                        nota_final: notaFinal,
+                        periodo: nota.curso.periodo,
+                        estado: 'APROBADO'
+                    };
+                })
+                .filter(item => item !== null);
+            
+            console.log(`✅ Cursos aprobados: ${cursosAprobados.length}`);
+            
+            return cursosAprobados;
+            
+        } catch (error) {
+            console.error("❌ Error al obtener cursos aprobados:", error.message);
+            
+            // Ayuda para debugging
+            if (error.name === 'SequelizeEagerLoadingError') {
+                console.error(`
+┌──────────────────────────────────────────────────────┐
+│ ERROR: Las relaciones no están configuradas         │
+├──────────────────────────────────────────────────────┤
+│ Verifica en los models:                              │
+│ • nota.model.js tiene: belongsTo(Curso, {as:'curso'})│
+│ • curso.model.js tiene: belongsTo(Materia, {as:'materia'})│
+└──────────────────────────────────────────────────────┘
+                `);
             }
             
-            // Transformar datos al formato que espera el PDF generator
-            return boletas.map(boleta => ({
-                id_boleta: boleta.id_boleta,
-                concepto: this._generarConcepto(boleta.transaccion), // Generar concepto dinámico
-                monto: parseFloat(boleta.monto), // Asegurar que sea número
-                fecha_pago: boleta.fecha_pago,
-                banco: boleta.banco || 'N/A',
-                transaccion: boleta.transaccion,
-                estado: boleta.estado || 'PENDIENTE'
+            throw error;
+        }
+    }
+    
+    /**
+     * ========================================
+     * MÉTODO: obtenerNotasPorSemestre
+     * ========================================
+     */
+    async obtenerNotasPorSemestre(idEstudiante, semestre) {
+        try {
+            console.log(`🔍 Buscando notas del estudiante ${idEstudiante} en semestre ${semestre}`);
+            
+            const Nota = db.notas;
+            const Curso = db.cursos;
+            const Materia = db.materias;
+            
+            const notas = await Nota.findAll({
+                where: {
+                    id_estudiante: idEstudiante
+                },
+                include: [{
+                    model: Curso,
+                    as: 'curso',
+                    required: true,
+                    where: {
+                        periodo: semestre
+                    },
+                    include: [{
+                        model: Materia,
+                        as: 'materia',
+                        required: true
+                    }]
+                }],
+                raw: false
+            });
+            
+            console.log(`✅ Se encontraron ${notas.length} notas en el semestre`);
+            
+            return notas.map(nota => {
+                const notaFinal = 
+                    (nota.primer_parcial || 0) + 
+                    (nota.segundo_parcial || 0) + 
+                    (nota.parcial_final || 0) + 
+                    (nota.actividades || 0);
+                
+                return {
+                    codigo: `${nota.curso.materia.nombre.substring(0, 3).toUpperCase()}${nota.curso.id}`,
+                    nombre: nota.curso.materia.nombre,
+                    creditos: nota.curso.materia.creditos,
+                    primer_parcial: nota.primer_parcial || 0,
+                    segundo_parcial: nota.segundo_parcial || 0,
+                    parcial_final: nota.parcial_final || 0,
+                    actividades: nota.actividades || 0,
+                    nota_final: notaFinal,
+                    estado: notaFinal >= 61 ? 'APROBADO' : 'REPROBADO'
+                };
+            });
+            
+        } catch (error) {
+            console.error("❌ Error al obtener notas por semestre:", error.message);
+            throw error;
+        }
+    }
+    
+    /**
+     * ========================================
+     * MÉTODO: obtenerPagosEstudiante
+     * ========================================
+     */
+    async obtenerPagosEstudiante(idEstudiante) {
+        try {
+            console.log(`🔍 Buscando pagos del estudiante ${idEstudiante}`);
+            
+            const Boleta = db.boletas;
+            
+            const pagos = await Boleta.findAll({
+                where: {
+                    id_estudiante: idEstudiante
+                },
+                order: [['fecha_pago', 'DESC']],
+                limit: 50
+            });
+            
+            console.log(`✅ Se encontraron ${pagos.length} pagos`);
+            
+            return pagos.map(pago => ({
+                id_boleta: pago.id_boleta,
+                monto: parseFloat(pago.monto),
+                fecha_pago: pago.fecha_pago,
+                banco: pago.banco,
+                transaccion: pago.transaccion,
+                estado: pago.estado,
+                concepto: pago.concepto || 'Pago de colegiatura'
             }));
             
         } catch (error) {
-            console.error('Error al obtener pagos de estudiante:', error);
+            console.error("❌ Error al obtener pagos:", error.message);
             throw error;
         }
-    }
-    
-    // MÉTODO AUXILIAR: Generar concepto dinámico
-    _generarConcepto(tipoTransaccion) {
-        const conceptos = {
-            'TARJETA': 'Pago con tarjeta de crédito/débito',
-            'EFECTIVO': 'Pago en efectivo',
-            'TRANSFERENCIA': 'Pago por transferencia bancaria',
-            'DEPOSITO': 'Depósito bancario',
-            'CHEQUE': 'Pago con cheque'
-        };
-        
-        const tipo = tipoTransaccion ? tipoTransaccion.toUpperCase() : '';
-        
-        // Buscar coincidencia parcial
-        for (const [key, value] of Object.entries(conceptos)) {
-            if (tipo.includes(key)) {
-                return value;
-            }
-        }
-        
-        // Si no coincide con ninguno, retornar genérico
-        return `Pago vía ${tipoTransaccion || 'No especificado'}`;
-    }
-    
-    // ------------------------------------
-    //-------------------------------------
-    // CURSOS APROBADOS (nota >= 61)
-    // TEMPORAL
-
-    async obtenerCursosAprobados(idEstudiante) {
-            
-        // TODO: Implementar consulta real cuando existan la tabla curso
-        // Query esperado:
-        // SELECT c.id, m.nombre, m.creditos, n.* 
-        // FROM notas n
-        // JOIN cursos c ON n.id_curso = c.id
-        // JOIN materias m ON c.id_materia = m.id
-        // WHERE n.id_estudiante = ? AND (n.primer_parcial + n.segundo_parcial + n.parcial_final + n.actividades) >= 61
-        
-
-        /* IMPLEMENTACIÓN DE ÇODIGO CUANDO SE OBTENGA EL MODEL CURSO:
-        
-        try {
-            const cursos = await db.sequelize.query(`
-                SELECT 
-                    c.id as id_curso,
-                    m.codigo,
-                    m.nombre,
-                    m.creditos,
-                    n.primer_parcial,
-                    n.segundo_parcial,
-                    n.parcial_final,
-                    n.actividades,
-                    (n.primer_parcial + n.segundo_parcial + n.parcial_final + n.actividades) as nota_final,
-                    c.periodo,
-                    'APROBADO' as estado
-                FROM notas n
-                JOIN cursos c ON n.id_curso = c.id
-                JOIN materias m ON c.id_materia = m.id
-                WHERE n.id_estudiante = :idEstudiante
-                AND (n.primer_parcial + n.segundo_parcial + n.parcial_final + n.actividades) >= 61
-                ORDER BY c.periodo, m.nombre
-            `, {
-                replacements: { idEstudiante },
-                type: db.Sequelize.QueryTypes.SELECT
-            });
-            
-            return cursos;
-            
-        } catch (error) {
-            console.error('Error al obtener cursos aprobados:', error);
-            throw error;
-        }
-        */
-    }
-
-    //-------------------------------
-    // NOTAS POR SEMESTRE
-    // TEMPORAR
-    async obtenerNotasPorSemestre(idEstudiante, semestre) {
-        // TODO: Implementar consulta cuando exista las tabla
-        
-        /* IMPLEMENTACIÓN OF (esperando tabla):
-        
-        try {
-            const notas = await db.sequelize.query(`
-                SELECT 
-                    m.codigo,
-                    m.nombre,
-                    m.creditos,
-                    n.primer_parcial,
-                    n.segundo_parcial,
-                    n.parcial_final,
-                    n.actividades,
-                    (n.primer_parcial + n.segundo_parcial + n.parcial_final + n.actividades) as nota_final,
-                    CASE 
-                        WHEN (n.primer_parcial + n.segundo_parcial + n.parcial_final + n.actividades) >= 61 
-                        THEN 'APROBADO' 
-                        ELSE 'REPROBADO' 
-                    END as estado
-                FROM notas n
-                JOIN cursos c ON n.id_curso = c.id
-                JOIN materias m ON c.id_materia = m.id
-                WHERE n.id_estudiante = :idEstudiante
-                AND c.periodo = :semestre
-                ORDER BY m.nombre
-            `, {
-                replacements: { idEstudiante, semestre },
-                type: db.Sequelize.QueryTypes.SELECT
-            });
-            
-            return notas;
-            
-        } catch (error) {
-            console.error('Error al obtener notas por semestre:', error);
-            throw error;
-        }
-        */
     }
 }
 
-module.exports = new DataService();
+module.exports = new DataRealService();
