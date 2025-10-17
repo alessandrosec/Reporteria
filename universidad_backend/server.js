@@ -49,7 +49,14 @@ try{
   console.error("❌ Error al cargar docente.routes.js:", err.message);
 }
 
-require("./app/routes/boleta.route")(app);
+try {
+  require("./app/routes/boleta.route")(app);
+  console.log("boleta.route.js cargado correctamente");
+} catch(err){
+  console.error("no cargado", err.message);
+}
+
+
 require("./app/routes/factura.route")(app);
 
 try{

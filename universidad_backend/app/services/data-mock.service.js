@@ -5,9 +5,7 @@
 
 class DataMockService {
     
-    // ========================================
     // ESTUDIANTE
-    // ========================================
     async obtenerInfoEstudiante(idEstudiante) {
         return {
             id: idEstudiante,
@@ -20,9 +18,8 @@ class DataMockService {
         };
     }
     
-    // ========================================
+
     // CURSOS APROBADOS (nota >= 61)
-    // ========================================
     async obtenerCursosAprobados(idEstudiante) {
         // Simula consulta:
         // SELECT c.id, m.nombre, m.creditos, n.* 
@@ -87,9 +84,8 @@ class DataMockService {
         ];
     }
     
-    // ========================================
+
     // NOTAS POR SEMESTRE
-    // ========================================
     async obtenerNotasPorSemestre(idEstudiante, semestre) {
         const todosCursos = {
             '2024-1': [
@@ -189,9 +185,8 @@ class DataMockService {
         return todosCursos[semestre] || [];
     }
     
-    // ========================================
+
     // PAGOS (usa tus tablas existentes)
-    // ========================================
     async obtenerPagosEstudiante(idEstudiante) {
         // Simula consulta: SELECT * FROM boletas WHERE id_estudiante = ?
         return [
