@@ -18,9 +18,7 @@ class PDFGeneratorService {
       }
    }
    
-    // ========================================
     // CERTIFICADO DE CURSOS APROBADOS
-    // ========================================
    generarCertificadoCursos(datos) {
       const doc = new PDFDocument({ margin: 50 });
       
@@ -78,9 +76,7 @@ class PDFGeneratorService {
       return doc;
    }
    
-    // ========================================
     // REPORTE DE NOTAS POR SEMESTRE
-    // ========================================
    generarReporteNotas(datos) {
       const doc = new PDFDocument({ margin: 50 });
       
@@ -148,9 +144,7 @@ class PDFGeneratorService {
       return doc;
    }
    
-    // ========================================
     // REPORTE DE PAGOS
-    // ========================================
    generarReportePagos(datos) {
       const doc = new PDFDocument({ margin: 50 });
       
