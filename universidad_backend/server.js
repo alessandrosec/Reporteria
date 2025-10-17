@@ -61,7 +61,7 @@ require("./app/routes/factura.route")(app);
 
 try{
   require("./app/routes/reporte.routes")(app);
-  console.log("✅ reporte.routes.js cargado correctamente");
+  console.log("reporte.routes.js cargado correctamente");
 }catch(err){
   console.error("❌ Error al cargar reporte.routes.js:", err.message);
 }

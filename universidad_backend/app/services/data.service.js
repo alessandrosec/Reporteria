@@ -9,7 +9,7 @@ class DataRealService {
         try {
             console.log(` Buscando estudiante con ID: ${idEstudiante}`);
             
-            const Estudiante = db.estudiantes;
+            const Estudiante = db.estudiante;
             
             const estudiante = await Estudiante.findByPk(idEstudiante);
             
@@ -41,9 +41,9 @@ class DataRealService {
         try {
             console.log(`buscando cursos aprobados del estudiante ${idEstudiante}`);
             
-            const Nota = db.notas;
-            const Curso = db.cursos;
-            const Materia = db.materias;
+            const Nota = db.nota;
+            const Curso = db.curso;
+            const Materia = db.materia;
             
             // Consulta con JOINs
             const notas = await Nota.findAll({
@@ -114,9 +114,9 @@ class DataRealService {
         try {
             console.log(`Buscando notas del estudiante ${idEstudiante} en semestre ${semestre}`);
             
-            const Nota = db.notas;
-            const Curso = db.cursos;
-            const Materia = db.materias;
+            const Nota = db.nota;
+            const Curso = db.curso;
+            const Materia = db.materia;
             
             const notas = await Nota.findAll({
                 where: {
@@ -172,7 +172,7 @@ class DataRealService {
         try {
             console.log(`Buscando pagos del estudiante ${idEstudiante}`);
             
-            const Boleta = db.boletas;
+            const Boleta = db.boleta;
             
             const pagos = await Boleta.findAll({
                 where: {
