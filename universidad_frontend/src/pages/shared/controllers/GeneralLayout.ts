@@ -1,5 +1,5 @@
 import { Loading } from "@/components/Loading";
-import { DArrowRight, Menu, User } from "@element-plus/icons-vue";
+import { DArrowRight, Menu, User, Document} from "@element-plus/icons-vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -15,6 +15,12 @@ export default defineComponent({
         this.$router.push("/");
       }, 3000);
     },
+
+    // NUEVO: Método para ir a Reportería
+    irAReportes() {
+      this.$router.push("/general/reportes");
+    }
+    
   },
   components: {
     Menu,

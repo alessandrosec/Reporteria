@@ -31,6 +31,15 @@
                 </el-icon>Docentes</el-menu-item>
             </el-sub-menu>
           </el-sub-menu>
+          
+          <!-- NUEVO: Menú de Reportería -->
+          <el-menu-item index="2" @click="irAReportes">
+            <el-icon>
+              <Document />
+            </el-icon>
+            <span>Reportería y Documentos</span>
+          </el-menu-item>
+
         </el-menu>
       </el-scrollbar>
     </el-aside>

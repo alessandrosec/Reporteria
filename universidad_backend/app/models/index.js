@@ -26,7 +26,7 @@ db.sequelize = sequelize;
 
 db.usuarios = require("./usuario.model.js")(sequelize, Sequelize);
 db.estudiante = require("./estudiante.model.js")(sequelize, Sequelize);
-db.estudiantes = db.estudiante;
+// db.estudiantes = db.estudiante;
 db.boleta = require("./boleta.model.js")(sequelize, Sequelize);
 db.factura = require("./factura.model.js")(sequelize, Sequelize);
 db.historialReporte = require("./historial_reporte.model.js")(sequelize, Sequelize);
