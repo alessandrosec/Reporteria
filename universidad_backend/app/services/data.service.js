@@ -117,13 +117,7 @@ class DataRealService {
             // Ayuda para debugging
             if (error.name === 'SequelizeEagerLoadingError') {
                 console.error(`
-┌──────────────────────────────────────────────────────┐
-│ ERROR: Las relaciones no están configuradas         │
-├──────────────────────────────────────────────────────┤
-│ Verifica en los models:                              │
-│ • nota.model.js tiene: belongsTo(Curso, {as:'curso'})│
-│ • curso.model.js tiene: belongsTo(Materia, {as:'materia'})│
-└──────────────────────────────────────────────────────┘
+
                 `);
             }
             

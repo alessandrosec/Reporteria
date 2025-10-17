@@ -41,10 +41,11 @@ module.exports = (sequelize, Sequelize) => {
     ]
     });
 
-        Estudiante.hasMany(Nota, {
+    Estudiante.hasMany(Nota, {
         foreignKey: "id_estudiante",
         as: "notas"
     });
+
     Nota.belongsTo(Estudiante, {
         foreignKey: "id_estudiante",
         as: "estudiante"
@@ -54,6 +55,7 @@ module.exports = (sequelize, Sequelize) => {
         foreignKey: "id_curso",
         as: "notas"
     });
+    
     Nota.belongsTo(Curso, {
         foreignKey: "id_curso",
         as: "curso"
