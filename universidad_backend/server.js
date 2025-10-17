@@ -66,6 +66,14 @@ try{
   console.error("❌ Error al cargar reporte.routes.js:", err.message);
 }
 
+//RUTAS DE PRUEBA (SIN autenticación - SOLO PARA DESARROLLO)
+try{
+  require("./app/routes/reporte-test.routes")(app);
+  console.log("⚠️ reporte-test.routes.js cargado (SIN AUTENTICACIÓN - SOLO DESARROLLO)");
+}catch(err){
+  console.error("❌ Error al cargar reporte-test.routes.js:", err.message);
+}
+
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
   console.log(`Servidor levantado en puerto ${PORT}.`);
