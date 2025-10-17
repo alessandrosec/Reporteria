@@ -34,16 +34,5 @@ module.exports = (sequelize, Sequelize) => {
     timestamps: false
   });
 
-  // RELACIONES Geovanny
-  Boleta.belongsTo(Estudiante, {
-        foreignKey: "id_estudiante",
-        as: "estudiante"
-    });
-    
-    Estudiante.hasMany(Boleta, {
-        foreignKey: "id_estudiante",
-        as: "boletas"
-    });
-
   return Boleta;
 };

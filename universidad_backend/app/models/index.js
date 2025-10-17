@@ -1,6 +1,7 @@
 const dbConfig = require("../config/db.config.js");
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+
   host: dbConfig.HOST,
   port: dbConfig.port,
   dialect: dbConfig.dialect,
@@ -23,29 +24,16 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-try {
-  db.usuarios = require("./usuario.model.js")(sequelize, Sequelize);
-  console.log("✅ Modelo 'usuario' cargado correctamente.");
-} catch (err) {
-  console.error("❌ Error al cargar modelo 'usuario':", err.message);
-}
-
-try {
-  db.estudiante = require("./estudiante.model.js")(sequelize, Sequelize);
-  console.log("✅ Modelo 'estudiante' cargado correctamente.");
-} catch (err) {
-  console.error("❌ Error al cargar modelo 'estudiante':", err.message);
-}
-
+db.usuarios = require("./usuario.model.js")(sequelize, Sequelize);
+db.estudiante = require("./estudiante.model.js")(sequelize, Sequelize);
 db.boleta = require("./boleta.model.js")(sequelize, Sequelize);
 db.factura = require("./factura.model.js")(sequelize, Sequelize);
-
-try {
-  db.historialReporte = require("./historial_reporte.model.js")(sequelize, Sequelize);
-  console.log("✅ Modelo 'historialReporte' cargado correctamente.");
-} catch (err) {
-  console.error("❌ Error al cargar modelo 'historialReporte':", err.message);
-}
+db.historialReporte = require("./historial_reporte.model.js")(sequelize, Sequelize);
+db.nota = require ("./nota.model.js")(sequelize, Sequelize);
+db.curso = require ("./curso.model.js")(sequelize, Sequelize);
+db.materia = require ("./materia.model.js")(sequelize, Sequelize);
+db.docente = require ("./docente.model.js")(sequelize, Sequelize);
+db.carrera = require ("./carrera.model.js")(sequelize, Sequelize);
 
 //Definir relaciones entre modelos
 db.estudiante.hasMany(db.boleta, {
@@ -68,7 +56,7 @@ if (db.estudiante && db.historialReporte) {
     foreignKey: "id_estudiante",
     as: "estudiante"
   });
-  console.log("✅ Relación Estudiante-HistorialReporte definida.");
+  console.log("Relación Estudiante-HistorialReporte definida.");
 }
 
 console.log("\n✅ Todos los modelos y relaciones cargados.\n");

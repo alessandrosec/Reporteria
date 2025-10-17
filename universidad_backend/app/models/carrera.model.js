@@ -1,0 +1,35 @@
+// carrera.model.js
+module.exports = (sequelize, Sequelize) => {
+    const Docente = require("./docente.model")(sequelize, Sequelize);
+
+    const Carrera = sequelize.define("carrera", {
+            id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        nombre: {
+            type: Sequelize.STRING
+        },
+        facultad: {
+            type: Sequelize.STRING
+        },
+        duracion: {
+            type: Sequelize.INTEGER,   // equivale a TIMESTAMP WITH TIME ZONE
+            field: "DURACION"
+        }
+    });
+
+    // Relación: un docente pertenece a un usuario
+    Docente.belongsTo(Carrera, {
+        foreignKey: "id_carrera",
+        targetKey: "id",
+    });
+
+    Carrera.hasMany(Docente, {
+        foreignKey: "id_carrera",
+        sourceKey: "id",
+    });
+
+    return Carrera;
+};

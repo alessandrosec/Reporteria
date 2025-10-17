@@ -1,7 +1,7 @@
 const db = require("../models");
 const HistorialReporte = db.historialReportes;
 const pdfGenerator = require("../services/pdf-generator.service");
-const dataService = require("../services/data.service");
+const dataService = require("../services/data-mock.service");
 
 // CERTIFICADO CURSOS - (JSON)
 exports.previewCertificadoCursos = async (req, res) => {
